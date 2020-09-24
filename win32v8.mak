@@ -26,7 +26,7 @@ CFLAGS	= -nologo -W2 -EHsc -O2 -MT -DNDEBUG -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NO
 CFLAGSD = -nologo -W2 -Z7 -RTC1 -EHsc -Od -MTd -D_DEBUG -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NON_CONFORMING_SWPRINTFS
 LDFLAGS	= -nologo -subsystem:windows -incremental:no -machine:I386
 LDFLAGSD= -nologo -debug -subsystem:windows -incremental:no -machine:I386
-LIBS	= shell32.lib user32.lib advapi32.lib gdi32.lib comctl32.lib
+LIBS	= shell32.lib user32.lib advapi32.lib gdi32.lib comctl32.lib dwmapi.lib
 
 !IFDEF vwUNICODE
 CUCDEFS = -DUNICODE -D_UNICODE

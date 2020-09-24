@@ -42,6 +42,8 @@ enum {
 #include <commctrl.h>
 #include <signal.h>
 
+#include <dwmapi.h>
+
 /*#define _WIN32_MEMORY_DEBUG*/
 #ifdef _WIN32_MEMORY_DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -1896,6 +1898,11 @@ enumWindowsProc(HWND hwnd, LPARAM lParam)
     if((style = GetWindowLong(hwnd, GWL_STYLE)) & WS_CHILD)
         // Ignore all windows with child flag set
         return TRUE;
+    BOOL cloaked = FALSE;
+    HRESULT err = DwmGetWindowAttribute(hwnd, DWMWA_CLOAKED, &cloaked, sizeof(cloaked));
+    if (err != S_OK)
+        vwLogBasic((_T("Call to DwmGetWindowAttribute failed: %x\n"),err));
+    const BOOL visible = (style & WS_VISIBLE) && !cloaked;
     if((wb=vwWindowBaseFind(hwnd)) == NULL)
     {
         if(hwnd == dialogHWnd)
@@ -1930,7 +1937,7 @@ enumWindowsProc(HWND hwnd, LPARAM lParam)
             
         if(flags == 0)
         {
-            if(style & WS_VISIBLE)
+            if(visible)
                 // manage this window
                 flags = vwWINFLAGS_FOUND | vwWINFLAGS_VISIBLE | vwWINFLAGS_WINDOW | vwWINFLAGS_MANAGED | vwWINFLAGS_SHOWN | vwWINFLAGS_SHOW ;
             else
@@ -1946,7 +1953,7 @@ enumWindowsProc(HWND hwnd, LPARAM lParam)
             win = (vwWindow *) wb ;
             win->exStyle = exstyle ;
             win->zOrder[0] = (vwUInt) wt ;
-            if((style & WS_VISIBLE) == 0)
+            if(!visible)
                 vwLogBasic((_T("Got new unmanaged window %8x Proc %d Flg %x %x (%08x) %x\n"),
                             (int)win->handle,(int)win->processId,(int)win->flags,(int) exstyle,(int)style,win->zOrder[0])) ;
         }
@@ -1966,7 +1973,7 @@ enumWindowsProc(HWND hwnd, LPARAM lParam)
     vwLogVerbose((_T("Updating win %x Flgs %08x %08x %08x\n"),(int) hwnd,(int)win->flags,(int)win->exStyle,(int)style)) ;
     if(vwWindowIsNotManaged(win))
     {
-        if((style & WS_VISIBLE) == 0)
+        if(!visible)
             return TRUE ;
         /* window has become visible, start to manage it... */
         vwWindowBaseUnlink(wb) ;
@@ -1984,7 +1991,7 @@ enumWindowsProc(HWND hwnd, LPARAM lParam)
         vwWindowBaseLink(wb) ;
         return TRUE ;
     }
-    if(!(style & WS_VISIBLE))
+    if(!visible)
     {
         if(vwWindowIsVisible(win))
         {

@@ -3645,8 +3645,8 @@ vwWindowShowHide(vwWindow* aWindow, vwUInt flags)
                 }
                 SetWindowPos(aWindow->handle,0,0,0,0,0,(SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_DEFERERASE | SWP_NOACTIVATE)) ;
                 /* if minimized dont show popups */
-                if(vwWindowIsNotMinimized(aWindow))
-                    ShowOwnedPopups(aWindow->handle,TRUE) ;
+                /* if(vwWindowIsNotMinimized(aWindow))
+                    ShowOwnedPopups(aWindow->handle,TRUE) ; */
                 if((aWindow->flags & vwWINFLAGS_RM_TASKBAR_BUT) && (taskHWnd != NULL))
                 {
                     /* Make sure the taskbar does not create a button for this window */
@@ -3717,8 +3717,9 @@ vwWindowShowHide(vwWindow* aWindow, vwUInt flags)
                 }
                 SetWindowPos(aWindow->handle,0,0,0,0,0,(SWP_HIDEWINDOW | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE)) ;
                 /* if minimized dont show popups */
-                if(vwWindowIsNotMinimized(aWindow))
-                    ShowOwnedPopups(aWindow->handle,FALSE) ;
+                /* FIXME: Can't do this. For UWP windows, this causes the window's hidden flag to be unset, which then messes with the unhide logic. */
+                /* if(vwWindowIsNotMinimized(aWindow))
+                    ShowOwnedPopups(aWindow->handle,FALSE) ; */
             }
             else if(vwWindowIsHideByMinim(aWindow))
             {
